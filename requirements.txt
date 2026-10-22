@@ -1,0 +1,14 @@
+# Python 3.12 required  (python_requires = ">=3.12,<3.13")
+
+# Runtime dependencies
+langchain>=0.3
+langchain-openai>=0.3
+langgraph>=0.2,<2  # create_react_agent (invoice_agent.py) is removed in LangGraph 2.0
+langgraph-supervisor>=0.0.31,<0.1  # create_supervisor + post_model_hook (supervisor.py)
+SQLAlchemy>=2.0
+pydantic>=2.0,<3.0
+gradio>=6,<7  # Chatbot uses the messages format by default; theme/css go to launch() (app.py)
+python-dotenv>=1.0
+
+# Dev / test
+pytest>=8.0
