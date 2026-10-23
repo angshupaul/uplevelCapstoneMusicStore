@@ -177,7 +177,7 @@ Gradio **6.29.1** is installed (`requirements.txt` pins `gradio>=6,<7`). Things 
 
 ## Tests
 
-### Offline: `TestingTool/ui_test.py` (29 tests, about 4 seconds, no LLM)
+### Offline: `tests/ui_test.py` (29 tests, about 4 seconds, no LLM)
 
 They use the real app graph with the fakes from `app_test.py`, plus a music agent that can be made to fail on purpose.
 
@@ -212,7 +212,7 @@ The message appeared before the reply every time, and session 2 never saw anythi
 ### How to run
 
 ```
-python -m pytest TestingTool/ui_test.py -v
+python -m pytest tests/ui_test.py -v
 ```
 
 ## Limitations and follow-ups

@@ -3,32 +3,25 @@
 The LLM is replaced with simple fakes, so these run offline and cost nothing.
 The database is the real in-memory Chinook instance.
 
-Run from the project root with either:
-    python TestingTool/verification_test.py
-    python -m pytest TestingTool/verification_test.py -v
+Run from the project root:
+    python -m pytest tests/verification_test.py -v
 """
 
 import json
 import re
-import sys
-from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, StateGraph
+from langgraph.prebuilt import ToolNode
+from langgraph.types import Command
 
-from langgraph.checkpoint.memory import MemorySaver  # noqa: E402
-from langgraph.graph import END, StateGraph  # noqa: E402
-from langgraph.prebuilt import ToolNode  # noqa: E402
-from langgraph.types import Command  # noqa: E402
-
-import verification as V  # noqa: E402
-from tools import get_customer_invoices, get_invoice_line_items  # noqa: E402
-from verification import UserInput  # noqa: E402
-from fakes import FakeChat, FakeExtractor  # noqa: E402
+import verification as V
+from tools import get_customer_invoices, get_invoice_line_items
+from verification import UserInput
+from fakes import FakeChat, FakeExtractor
 
 # Customers 14 and 5 in Chinook.
 MARK = {"id": 14, "email": "mphilips12@shaw.ca", "phone": "+1 (780) 434-4554"}
@@ -320,7 +313,3 @@ def test_tool_uses_state_customer_not_llm_argument():
 
     assert invoices["CustomerId"] == MARK["id"]  # not customer 5
     assert "No invoice found" in line_items["message"]  # invoice 90 is customer 5's
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

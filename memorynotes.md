@@ -214,7 +214,7 @@ Before this feature, "I love jazz" on its own was classified as off-topic, so th
 
 ## Tests
 
-All in `TestingTool/memory_test.py`, plus memory tests in `app_test.py` and `music_agent_test.py`.
+All in `tests/memory_test.py`, plus memory tests in `app_test.py` and `music_agent_test.py`.
 
 ### Offline (fast, no LLM)
 
@@ -231,7 +231,7 @@ A fake extractor (`FakePreferenceExtractor` in `fakes.py`) only recognises "I lo
 
 ### Live (real LLM, a few cents per run)
 
-The tests named `test_live_*` run the full app with gpt-4o-mini, verified as customer 14. Each prints the input, the response, the stored profile and PASSED/FAILED.
+The tests named `test_live_*` (marked `live`, so a plain `pytest` run skips them) run the full app with gpt-4o-mini, verified as customer 14. Each prints the input, the response, the stored profile and PASSED/FAILED.
 
 | Requirement | Result (2 runs) |
 |---|---|
@@ -244,8 +244,8 @@ The tests named `test_live_*` run the full app with gpt-4o-mini, verified as cus
 ### How to run
 
 ```
-python -m pytest TestingTool/memory_test.py -k "not live"   # offline only, ~1 second
-python TestingTool/memory_test.py                            # everything, prints the live results
+python -m pytest tests/memory_test.py -v                     # offline only, ~1 second
+python -m pytest tests/memory_test.py -m live -v -s         # the live tests, printing their results
 ```
 
 ## Limitations

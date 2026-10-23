@@ -16,29 +16,23 @@ actually returned:
 
 Each test prints its input, the response and PASSED/FAILED.
 
-Run from the project root with either:
-    python TestingTool/Subagent_test.py
-    python -m pytest TestingTool/Subagent_test.py -v -s
+Run from the project root:
+    python -m pytest tests/Subagent_test.py -v
+    python -m pytest tests/Subagent_test.py -m live -v -s   # the live tests (real LLM)
 """
 
 import json
 import re
-import sys
 import uuid
-from pathlib import Path
 
 import pytest
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import HumanMessage
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import supervisor as S  # noqa: E402
-from config import ConfigError, get_settings  # noqa: E402
-from database import execute_query  # noqa: E402
-from graph import build_app  # noqa: E402
+import supervisor as S
+from config import ConfigError, get_settings
+from database import execute_query
+from graph import build_app
 
 try:
     get_settings()
@@ -228,6 +222,7 @@ def test_checker_flags_fabricated_titles_and_amounts(reply, problem):
 
 # --- Live tests ------------------------------------------------------------
 
+@pytest.mark.live
 def test_rock_albums_route_to_music_agent_with_real_data(ask):
     result = ask("What rock albums do you have?")
     results = result["tools"].results()
@@ -245,6 +240,7 @@ def test_rock_albums_route_to_music_agent_with_real_data(ask):
     ])
 
 
+@pytest.mark.live
 def test_invoices_route_to_invoice_agent_with_verified_id(ask):
     result = ask("Show me my invoices")
     invoice_results = [
@@ -263,6 +259,7 @@ def test_invoices_route_to_invoice_agent_with_verified_id(ask):
     ])
 
 
+@pytest.mark.live
 def test_weather_is_rejected_without_any_sub_agent(ask):
     result = ask("What's the weather?")
 
@@ -274,6 +271,7 @@ def test_weather_is_rejected_without_any_sub_agent(ask):
     ])
 
 
+@pytest.mark.live
 def test_mixed_request_runs_invoice_then_music(ask):
     result = ask("Show my invoices and also what jazz albums you have")
     names = result["tools"].names()
@@ -291,6 +289,7 @@ def test_mixed_request_runs_invoice_then_music(ask):
     ])
 
 
+@pytest.mark.live
 @pytest.mark.parametrize(
     "question",
     [
@@ -312,6 +311,7 @@ _NOTHING_FOUND = re.compile(
 )
 
 
+@pytest.mark.live
 @pytest.mark.parametrize(
     "question",
     [
@@ -334,7 +334,3 @@ def test_empty_results_are_reported_honestly(ask, question):
         ("reply says nothing was found", bool(_NOTHING_FOUND.search(result["reply"]))),
         grounded_check(result),
     ])
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v", "-s", "-p", "no:cacheprovider"]))

@@ -510,11 +510,15 @@ It doesn't reuse `_PURCHASED_COLUMNS` (which repeats `InvoiceDate` and `Customer
 
 ### Testing
 
-`TestingTool/toolstest.py` has 22 tests for `search_albums_by_artist`. Run them from the project root:
+`tests/tools_test.py` has 25 tests for `search_albums_by_artist`. Run them from the project root:
 
 ```
-python TestingTool/toolstest.py
-python -m pytest TestingTool/toolstest.py -v
+python -m pytest tests/tools_test.py -v
 ```
 
-`search_tracks_by_artist`, `browse_tracks_by_genre`, `search_songs_by_title`, `get_track_details`, `get_customer_invoices`, the purchased-tracks function and tool, `get_invoice_support_rep` and `get_invoice_line_items` have been checked by hand but have no automated tests yet.
+The other tools have no dedicated test file of their own yet, but the agent tests run them for real against the database:
+
+- `tests/music_agent_test.py` exercises `search_tracks_by_artist`, `browse_tracks_by_genre`, `search_songs_by_title` and `get_track_details`, including bad input and not-found results.
+- `tests/invoice_agent_test.py` exercises `get_customer_invoices`, `get_customer_purchased_tracks` (and so `fetch_purchased_tracks`), `get_invoice_support_rep` and `get_invoice_line_items`. This includes the ownership checks: another customer's invoice is reported as not found.
+
+These tests check what the agents do with each tool's result rather than every option of each tool, so edge cases such as limits and paging are still only partly covered.

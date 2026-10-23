@@ -1,14 +1,12 @@
 """Tests for the preference memory in memory.py.
 
-Run from the project root with either:
-    python TestingTool/memory_test.py
-    python -m pytest TestingTool/memory_test.py -v
+Run from the project root:
+    python -m pytest tests/memory_test.py -v
+    python -m pytest tests/memory_test.py -m live -v -s   # the live tests (real LLM)
 """
 
 import re
-import sys
 import uuid
-from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -16,17 +14,13 @@ from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langgraph.store.memory import InMemoryStore
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import memory as M  # noqa: E402
-from config import ConfigError, get_settings  # noqa: E402
-from fakes import FakePreferenceExtractor  # noqa: E402
-from graph import build_app  # noqa: E402
-from memory import UserProfile  # noqa: E402
-from music_agent import MUSIC_SYSTEM_PROMPT  # noqa: E402
-from verification import VERIFICATION_REPLY  # noqa: E402
+import memory as M
+from config import ConfigError, get_settings
+from fakes import FakePreferenceExtractor
+from graph import build_app
+from memory import UserProfile
+from music_agent import MUSIC_SYSTEM_PROMPT
+from verification import VERIFICATION_REPLY
 
 pytestmark = pytest.mark.filterwarnings("ignore:create_react_agent has been moved")
 
@@ -312,8 +306,9 @@ def test_extraction_prompt_covers_save_and_do_not_save_cases(example):
 #
 # Extraction is a judgement ("I love jazz" vs "Do you have jazz?"), so these
 # run the full app with the real LLM (gpt-4o-mini via config) and the real
-# database. Skipped without an API key; run only the offline tests above with
-#     python -m pytest TestingTool/memory_test.py -k "not live"
+# database. They are marked "live", so a plain pytest run skips them; run
+# them with  python -m pytest tests/memory_test.py -m live -v -s
+# (they are also skipped when no API key is configured).
 # Each prints its input, the response and the stored profile, then PASSED or
 # FAILED. Like any LLM evaluation, results can vary between runs.
 
@@ -388,6 +383,7 @@ def _has(preferences, item: str) -> bool:
     return any(p.casefold() == item.casefold() for p in preferences or [])
 
 
+@pytest.mark.live
 def test_live_saying_i_love_jazz_saves_jazz():
     customer = LiveCustomer()
     response = customer.say("I love jazz")
@@ -398,6 +394,7 @@ def test_live_saying_i_love_jazz_saves_jazz():
     ])
 
 
+@pytest.mark.live
 def test_live_asking_do_you_have_jazz_saves_nothing():
     customer = LiveCustomer()
     response = customer.say("Do you have jazz?")
@@ -408,6 +405,7 @@ def test_live_asking_do_you_have_jazz_saves_nothing():
     ])
 
 
+@pytest.mark.live
 def test_live_existing_preferences_are_never_removed():
     customer = LiveCustomer(saved=["rock", "AC/DC"])
     response = customer.say("I love jazz")
@@ -419,6 +417,7 @@ def test_live_existing_preferences_are_never_removed():
     ])
 
 
+@pytest.mark.live
 def test_live_next_message_gives_the_music_agent_the_saved_preferences():
     customer = LiveCustomer()
     first = customer.say("I love jazz")
@@ -439,6 +438,7 @@ def test_live_next_message_gives_the_music_agent_the_saved_preferences():
     ])
 
 
+@pytest.mark.live
 def test_live_no_new_preference_leaves_the_profile_unchanged():
     customer = LiveCustomer(saved=["rock", "AC/DC"])
     before = customer.saved_item()
@@ -449,7 +449,3 @@ def test_live_no_new_preference_leaves_the_profile_unchanged():
         ("preferences unchanged", customer.preferences() == ["rock", "AC/DC"]),
         ("the profile was not rewritten (same updated_at)", after.updated_at == before.updated_at),
     ])
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v", "-s", "-p", "no:cacheprovider"]))

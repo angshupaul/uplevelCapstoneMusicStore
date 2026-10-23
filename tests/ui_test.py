@@ -4,30 +4,23 @@ Everything runs offline: the graph is the real app graph with the fakes from
 app_test.py (keyword router, always-handoff supervisor model, recording fake
 agents, regex verification extractor, fake preference extractor).
 
-Run from the project root with either:
-    python TestingTool/ui_test.py
-    python -m pytest TestingTool/ui_test.py -v
+Run from the project root:
+    python -m pytest tests/ui_test.py -v
 """
 
-import sys
 import uuid
-from pathlib import Path
 
 import gradio as gr
 import pytest
 from langchain_core.messages import AIMessage
 from langgraph.graph import START, StateGraph
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import app as A  # noqa: E402
-import chat_service as C  # noqa: E402
-import memory  # noqa: E402
-import supervisor as S  # noqa: E402
-import verification as V  # noqa: E402
-from app_test import (  # noqa: E402
+import app as A
+import chat_service as C
+import memory
+import supervisor as S
+import verification as V
+from app_test import (
     INVOICE_ANSWER,
     MUSIC_ANSWER,
     AgentState,
@@ -35,9 +28,9 @@ from app_test import (  # noqa: E402
     KeywordRouter,
     fake_agent,
 )
-from chat_service import Done, Progress, Reply, TurnResult  # noqa: E402
-from fakes import FakeChat, FakeExtractor, FakePreferenceExtractor  # noqa: E402
-from graph import build_app  # noqa: E402
+from chat_service import Done, Progress, Reply, TurnResult
+from fakes import FakeChat, FakeExtractor, FakePreferenceExtractor
+from graph import build_app
 
 pytestmark = pytest.mark.filterwarnings("ignore:create_react_agent has been moved")
 
@@ -348,7 +341,3 @@ def test_each_session_gets_its_own_thread_id():
     state = A.build_ui().components["thread_id"]
     assert callable(state.value)  # Gradio calls it per browser session
     assert len({state.value() for _ in range(5)}) == 5
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

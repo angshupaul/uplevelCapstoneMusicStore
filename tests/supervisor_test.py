@@ -9,27 +9,20 @@ The supervisor model is often scripted to misbehave (wrong agent, wrong order,
 stopping early, delegating again) to prove routing is enforced in code, not
 just requested in the prompt.
 
-Run from the project root with either:
-    python TestingTool/supervisor_test.py
-    python -m pytest TestingTool/supervisor_test.py -v
+Run from the project root:
+    python -m pytest tests/supervisor_test.py -v
 """
 
 import json
-import sys
-from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import START, MessagesState, StateGraph
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import supervisor as S  # noqa: E402
-from fakes import ScriptedChatModel, asks_for, call  # noqa: E402
-from invoice_agent import build_invoice_agent  # noqa: E402
-from verification import VerifiedCustomer, verified_message  # noqa: E402
+import supervisor as S
+from fakes import ScriptedChatModel, asks_for, call
+from invoice_agent import build_invoice_agent
+from verification import VerifiedCustomer, verified_message
 
 pytestmark = pytest.mark.filterwarnings("ignore:create_react_agent has been moved")
 
@@ -309,7 +302,3 @@ def test_earlier_request_does_not_count_as_done():
     )
 
     assert agents_run(log) == [S.MUSIC_AGENT]
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

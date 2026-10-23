@@ -99,17 +99,14 @@ The API key is passed in at run time with `--env-file`; it is never copied into 
 The LLMs are replaced with fakes; the database and the graph are real.
 
 ```bash
-python -m pytest TestingTool/toolstest.py TestingTool/verification_test.py \
-  TestingTool/music_agent_test.py TestingTool/invoice_agent_test.py \
-  TestingTool/supervisor_test.py TestingTool/app_test.py \
-  TestingTool/memory_test.py TestingTool/ui_test.py -k "not live"
+python -m pytest tests/ -v
 ```
 
-Expected: **262 passed** in a few seconds.
+`pytest.ini` points pytest at `tests/` and leaves out the live tests by default, so a plain `pytest` run is always free.
 
 | File | Covers |
 |---|---|
-| `toolstest.py` | the catalog search tool |
+| `tools_test.py` | the catalog search tool |
 | `verification_test.py` | identifier extraction, customer lookup, interrupt and attempt limit |
 | `music_agent_test.py` | the music agent's tool loop, errors, and preferences in its prompt |
 | `invoice_agent_test.py` | the invoice agent; the verified ID can't be overridden |
@@ -117,16 +114,18 @@ Expected: **262 passed** in a few seconds.
 | `app_test.py` | the whole graph: verification, memory and supervisor routes |
 | `memory_test.py` | preference schema, cleaning, merging and write rules |
 | `ui_test.py` | the chat service and the Gradio handlers, including session isolation |
+| `Subagent_test.py` | the grounding checker used by the live evaluations (its live tests are marked `live`) |
 
-> **Don't run `pytest TestingTool` on its own.** It would also start the live tests below, which cost money, and `trial_test.py`, a script that writes output files.
+`tests/conftest.py` makes the project modules and the shared fakes (`tests/fakes.py`) importable.
 
 ### Live evaluations (real LLM, a few cents per run)
 
-These check the model's actual behaviour: routing, real data, no made-up names or amounts, and honest "not found" answers. Each prints the input, the response and PASSED/FAILED.
+These check the model's actual behaviour: routing, real data, no made-up names or amounts, and honest "not found" answers. Each prints the input, the response and PASSED/FAILED. They're marked `live`, so they only run when asked for:
 
 ```bash
-python TestingTool/Subagent_test.py                         # agents and routing
-python -m pytest TestingTool/memory_test.py -k live -s      # preference memory
+python -m pytest -m live -v -s                              # all live evaluations
+python -m pytest tests/Subagent_test.py -m live -v -s       # agents and routing
+python -m pytest tests/memory_test.py -m live -v -s         # preference memory
 ```
 
 LLM output varies between runs, so run them more than once before trusting a result.
@@ -240,7 +239,9 @@ Conversation history is kept per session by a LangGraph checkpointer (`MemorySav
 | `tools.py` | the database tools the agents call |
 | `database.py` | loads Chinook into in-memory SQLite; parameterized queries |
 | `llm.py` / `config.py` | the shared OpenAI model, and settings from `.env` |
-| `TestingTool/` | offline tests, live evaluations and shared fakes |
+| `tests/` | offline tests, live evaluations (`-m live`) and shared fakes |
+| `scripts/` | `trial_run.py`: calls the search tools and saves their output as JSON |
+| `pytest.ini` | test settings: test folder, the `live` marker |
 | `DBSet/` | the Chinook SQL script |
 
 ### Tech stack

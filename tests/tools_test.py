@@ -1,21 +1,14 @@
 """Tests for tools.search_albums_by_artist against the in-memory Chinook database.
 
-Run from the project root with either:
-    python TestingTool/toolstest.py
-    python -m pytest TestingTool/toolstest.py -v
+Run from the project root:
+    python -m pytest tests/tools_test.py -v
 """
 
 import json
-import sys
-from pathlib import Path
 
 import pytest
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-from tools import MAX_RESULTS, search_albums_by_artist  # noqa: E402
+from tools import MAX_RESULTS, search_albums_by_artist
 
 EXPECTED_COLUMNS = ["AlbumId", "AlbumTitle", "ArtistId", "ArtistName", "TrackCount"]
 
@@ -134,7 +127,3 @@ def test_tool_schema_exposed_to_agent():
     assert search_albums_by_artist.name == "search_albums_by_artist"
     assert set(search_albums_by_artist.args) == {"artist_name", "limit"}
     assert search_albums_by_artist.description
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

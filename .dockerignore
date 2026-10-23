@@ -11,7 +11,9 @@ __pycache__/
 .git/
 
 # Not needed to run the app
-TestingTool/
+tests/
+scripts/
+pytest.ini
 Preparation/
 Dockerfile
 .dockerignore

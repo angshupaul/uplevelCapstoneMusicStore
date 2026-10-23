@@ -6,26 +6,19 @@ cost nothing. The tools run for real against the in-memory Chinook database.
 The key property: the customer whose data is read always comes from the
 verified customer_id in graph state, never from the model or the user.
 
-Run from the project root with either:
-    python TestingTool/invoice_agent_test.py
-    python -m pytest TestingTool/invoice_agent_test.py -v
+Run from the project root:
+    python -m pytest tests/invoice_agent_test.py -v
 """
 
 import json
-import sys
-from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import invoice_agent as I  # noqa: E402
-from fakes import ScriptedChatModel, asks_for, call  # noqa: E402
-import tools  # noqa: E402
-from verification import VerifiedCustomer, verified_message  # noqa: E402
+import invoice_agent as I
+from fakes import ScriptedChatModel, asks_for, call
+import tools
+from verification import VerifiedCustomer, verified_message
 
 pytestmark = pytest.mark.filterwarnings("ignore:create_react_agent has been moved")
 
@@ -282,7 +275,3 @@ def test_exception_inside_a_tool_becomes_an_error_result(monkeypatch):
 
     assert tool_results(out) == [{"error": "RuntimeError: database is unavailable"}]
     assert len(model.calls) == 2  # the loop carried on so the model could report it
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

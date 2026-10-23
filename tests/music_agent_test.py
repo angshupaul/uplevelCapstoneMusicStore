@@ -3,26 +3,19 @@
 The LLM is replaced with a scripted fake, so these run offline and cost
 nothing. The tools run for real against the in-memory Chinook database.
 
-Run from the project root with either:
-    python TestingTool/music_agent_test.py
-    python -m pytest TestingTool/music_agent_test.py -v
+Run from the project root:
+    python -m pytest tests/music_agent_test.py -v
 """
 
 import json
-import sys
-from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+from langgraph.graph import END
 
-from langgraph.graph import END  # noqa: E402
-
-import music_agent as M  # noqa: E402
-import tools  # noqa: E402
+import music_agent as M
+import tools
 
 
 class ScriptedLLM:
@@ -261,7 +254,3 @@ def test_tool_outside_the_catalog_set_is_rejected(run):
     assert result.status == "error"
     assert "get_customer_invoices" in result.content
     assert len(llm.calls) == 2
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

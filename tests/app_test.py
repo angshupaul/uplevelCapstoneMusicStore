@@ -11,15 +11,12 @@ Everything runs offline. The LLMs are fakes:
 The real verification nodes, routing hook, memory nodes, checkpointer,
 store and database all run.
 
-Run from the project root with either:
-    python TestingTool/app_test.py
-    python -m pytest TestingTool/app_test.py -v
+Run from the project root:
+    python -m pytest tests/app_test.py -v
 """
 
 import json
-import sys
 import uuid
-from pathlib import Path
 from typing import NotRequired
 
 import pytest
@@ -31,16 +28,12 @@ from langgraph.store.memory import InMemoryStore
 from langgraph.types import Command
 from pydantic import Field
 
-# Make the project root importable when this file is run directly.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
-
-import graph  # noqa: E402
-import memory  # noqa: E402
-import music_agent  # noqa: E402
-import supervisor as S  # noqa: E402
-import verification as V  # noqa: E402
-from fakes import (  # noqa: E402
+import graph
+import memory
+import music_agent
+import supervisor as S
+import verification as V
+from fakes import (
     FakeChat,
     FakeExtractor,
     FakePreferenceExtractor,
@@ -48,7 +41,7 @@ from fakes import (  # noqa: E402
     asks_for,
     call,
 )
-from invoice_agent import build_invoice_agent  # noqa: E402
+from invoice_agent import build_invoice_agent
 
 pytestmark = pytest.mark.filterwarnings("ignore:create_react_agent has been moved")
 
@@ -462,7 +455,3 @@ def test_create_memory_reads_only_the_conversation(app, pref_extractor):
     assert "Verified customer" not in transcript.content  # no system messages
     assert "transfer_to" not in transcript.content  # no handoffs
     assert f"Assistant: {INVOICE_ANSWER}" in transcript.content
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-v"]))

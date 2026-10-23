@@ -1,7 +1,7 @@
 """Call search tools and print the results.
 
 Run from the project root:
-    python TestingTool/trial_test.py
+    python scripts/trial_run.py
 
 Each tool runs only if its output JSON is missing from ProjectExecution.
 """
