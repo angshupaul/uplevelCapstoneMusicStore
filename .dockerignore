@@ -1,0 +1,17 @@
+# Secrets: pass them at run time (docker run --env-file .env)
+.env
+.env.*
+
+# Local environment and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.git/
+
+# Not needed to run the app
+TestingTool/
+Preparation/
+Dockerfile
+.dockerignore

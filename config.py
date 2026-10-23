@@ -7,6 +7,8 @@ Variables (read from the process environment, or from ``.env`` in the project ro
     LLM_TEMPERATURE   optional  float in [0, 2], default 0.0
     LLM_API_BASE_URL  optional  default None (use the provider's default endpoint)
     PORT              optional  int in [1, 65535], default 7860
+    HOST              optional  address the web app listens on, default 127.0.0.1
+                                (local only; the Docker image sets 0.0.0.0)
 
 Real environment variables take precedence over values in ``.env``.
 """
@@ -23,6 +25,7 @@ ENV_FILE = PROJECT_ROOT / ".env"
 
 DEFAULT_TEMPERATURE = 0.0
 DEFAULT_PORT = 7860  # Gradio's default port
+DEFAULT_HOST = "127.0.0.1"  # local only
 
 
 class ConfigError(ValueError):
@@ -37,6 +40,7 @@ class Settings:
     temperature: float = DEFAULT_TEMPERATURE
     api_base_url: str | None = None
     port: int = DEFAULT_PORT
+    host: str = DEFAULT_HOST
 
 
 def _get(*names: str) -> str | None:
@@ -89,4 +93,5 @@ def get_settings() -> Settings:
         temperature=_parse_temperature(_get("LLM_TEMPERATURE")),
         api_base_url=_get("LLM_API_BASE_URL"),
         port=_parse_port(_get("PORT")),
+        host=_get("HOST") or DEFAULT_HOST,
     )

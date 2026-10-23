@@ -283,8 +283,9 @@ def build_ui(graph: CompiledStateGraph | None = None) -> gr.Blocks:
 
 
 if __name__ == "__main__":
+    settings = get_settings()
     build_ui().queue().launch(
-        server_name="127.0.0.1",  # local only; see the notes before exposing it
-        server_port=get_settings().port,
+        server_name=settings.host,  # 127.0.0.1 unless HOST says otherwise (Docker: 0.0.0.0)
+        server_port=settings.port,
         css=APP_CSS,
     )
