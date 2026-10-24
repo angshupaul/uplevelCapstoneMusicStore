@@ -259,8 +259,8 @@ LangGraph (with `langgraph-supervisor`), LangChain with OpenAI, Gradio 6, SQLAlc
 
 | File | Contents |
 |---|---|
-| `docs/ARCHITECTURE.md` | beginner-level architecture diagrams and key concepts, for instructors |
-| `docs/TECHNICAL_SPECIFICATION.md` | short technical specification: requirements, components, agents, tools, data |
+| `docs/ARCHITECTURE.md` | High-level architecture diagrams and key concepts, for instructors |
+| `docs/TECHNICAL_SPECIFICATION.md` | Technical specification overview: requirements, components, agents, tools, data |
 | `DB_SETUP_STEPS.md` | how the database is loaded |
 | `notes.md` | the tools and the database helpers |
 | `memorynotes.md` | how preference memory works |
